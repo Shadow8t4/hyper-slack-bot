@@ -1,0 +1,14 @@
+**/.pyenv/**
+**/*.pyc
+**/__pycache__/**
+.python-version
+**/.vscode/**
+logs/**
+.api_token**
+tester.py
+**/report.html
+**/log.html
+**/output.xml
+output/**
+assets/**
+slackbot_config.json

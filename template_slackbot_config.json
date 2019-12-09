@@ -1,0 +1,13 @@
+{
+    "emoji_sub":":confetti_ball:",
+    "db_user":"slackbot",
+    "word_chars":"fun",
+    "phrase_re":"(f[a-zA-Z']+ u[a-zA-Z']+ n[a-zA-Z']+|fun)",
+    "emoji_re":"(?!:)[Yy]a(y)+(?!:)",
+    "functions_status":
+    {
+        "phrase": true,
+        "emoji": true,
+        "bingo": true
+    }
+}
