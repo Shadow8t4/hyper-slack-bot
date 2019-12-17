@@ -8,9 +8,9 @@ Clone this repo, then make sure you have the modules listed in `Pipfile` in your
 
 If you have [pyenv](https://github.com/pyenv/pyenv) installed, you can install the proper Python environment needed by executing:
 
-`pyenv install 3.7.2`
+`pyenv install 3.7.4`
 
-`pyenv local 3.7.2`
+`pyenv local 3.7.4`
 
 `pyenv exec pip install pipenv`
 
