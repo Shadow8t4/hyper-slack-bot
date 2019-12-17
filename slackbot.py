@@ -2,33 +2,18 @@
 from lib.bot_logging import log_output
 from lib.import_db import import_bingo, import_words
 from lib.manage_readonly import import_readonly
+from lib.import_config import Config
 import lib.slack_bot_events as sbe
-from tests.test_runner import run_tests
 import slack
 from os import environ, fork, mkdir
 from os.path import exists
 from sys import argv
 from datetime import datetime
-import re
-import json
+from re import search
 
 
 """ Initialize Global Variables """
-
-# Load from a config json file the necessary parameters
-config_dict = json.load(open('slackbot_config.json', 'rb'))
-# Emoji to substitute when matching
-emoji_sub = config_dict['emoji_sub']
-# Database user to read from database as
-db_user = config_dict['db_user']
-# Characters to generate words for when matching a phrase
-word_chars = config_dict['word_chars']
-# Regex for phrase replacement searches in messages
-phrase_re = config_dict['phrase_re']
-# Regex for emoji injection searches in messages
-emoji_re = config_dict['emoji_re']
-# Dict for enabling/disabling bot functionality
-functions_status = config_dict['functions_status']
+config = Config()
 
 
 def parse_args():
@@ -122,7 +107,23 @@ def trigger_event(**payload):
                     output = sbe.delete_readonly(
                         environ['SLACK_API_TOKEN_ADMIN'], data['text'], data['channel'], data['ts'])
             else:
-                phrase_match = re.search(phrase_re, data['text'].lower())
+
+                if(data['text'] == '!update'):
+                    log_output(environ['SLACK_BOT_ENV'],
+                               '\t***** Shutdown for update *****\n')
+                    web_client.chat_postMessage(
+                        channel=data['channel'],
+                        text='Checking for updates....'
+                    )
+                    sbe.attempt_update(environ['SLACK_BOT_ENV'],
+                                       web_client, data['channel'])
+                    return
+
+                if(data['text'] == '!shutdown'):
+                    rtm_client.stop()
+                    return
+
+                phrase_match = search(config.phrase_re, data['text'].lower())
 
                 # Remove exceptions from text before matching for emoji injection
                 filtered_data = []
@@ -135,28 +136,33 @@ def trigger_event(**payload):
                         filtered_data.append(w)
                     else:
                         data_text_filtered.append(w)
-                emoji_match = re.search(emoji_re, ' '.join(data_text_filtered))
+                emoji_match = search(
+                    config.emoji_re, ' '.join(data_text_filtered))
 
                 if(data['text'].split(' ')[0] == '!announce'):
                     sbe.announce(web_client, data['text'], data['channel'])
 
                 if(data['text'].split(' ')[0] == '!disable'):
-                    sbe.disable_function(web_client, data, functions_status)
+                    sbe.disable_function(
+                        web_client, data, config.functions_status)
 
-                if functions_status['emoji'] and emoji_match:
+                if config.functions_status['emoji'] and emoji_match:
                     bot_user_id = web_client.auth_test()['user_id']
                     if not (bot_user_id is data['user']):
                         sbe.format_replaced_message(environ['SLACK_API_TOKEN_ADMIN'], web_client,
-                                     data_text_filtered, filtered_data, data, emoji_re, emoji_sub)
+                                                    data_text_filtered, filtered_data, data, config.emoji_re, config.emoji_sub)
 
-                if functions_status['phrase'] and phrase_match:
-                    sbe.trigger_response(web_client, data, phrase_match, word_chars, user=db_user)
+                if config.functions_status['phrase'] and phrase_match:
+                    sbe.trigger_response(
+                        web_client, data, phrase_match, config.word_chars, user=config.db_user)
 
-                if functions_status['bingo'] and (data['text'].lower() == 'bingo'):
-                    sbe.bingo(web_client, data, user=db_user)
+                if config.functions_status['bingo'] and (data['text'].lower() == 'bingo'):
+                    sbe.bingo(web_client, data, user=config.db_user,
+                              font=config.fontpath)
 
                 if(data['text'].split(' ')[0] == '!enable'):
-                    sbe.enable_function(web_client, data, functions_status)
+                    sbe.enable_function(
+                        web_client, data, config.functions_status)
 
                 if(data['text'].split(' ')[0] == '!readonly'):
                     if(len(data['text'].split(' ')) > 0):
@@ -181,19 +187,6 @@ def trigger_event(**payload):
                             text='Usage: !readonly [channel] or !readonly list'
                         )
 
-                if(data['text'] == '!update'):
-                    log_output(environ['SLACK_BOT_ENV'],
-                               '\t***** Shutdown for update *****\n')
-                    web_client.chat_postMessage(
-                        channel=data['channel'],
-                        text='Checking for updates....'
-                    )
-                    sbe.attempt_update(environ['SLACK_BOT_ENV'],
-                                       web_client, data['channel'])
-
-                if(data['text'] == '!shutdown'):
-                    rtm_client.stop()
-
     except Exception as e:
         output += '{0}\tAn error occurred: {1}\n'.format(datetime.now(), e)
 
@@ -203,8 +196,8 @@ def trigger_event(**payload):
 def main():
     """Ensure there's an output folder for logs, start the bot.
     """
-    import_words(user=db_user)
-    import_bingo(user=db_user)
+    import_words(user=config.db_user)
+    import_bingo(user=config.db_user)
 
     if(not exists('./logs')):
         mkdir('logs')
@@ -233,7 +226,7 @@ if(__name__ == '__main__'):
         api_token_file = open('.api_token_admin_dev')
         environ['SLACK_API_TOKEN'] = api_token_file.readline().strip()
         environ['SLACK_BOT_ENV'] = 'Dev'
-        run_tests(input_dict['num'])
+        # run_tests(input_dict['num'])
     else:
         api_token_admin_file = open(
             '.api_token_admin_{0}'.format(input_dict['env']))

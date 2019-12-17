@@ -16,4 +16,4 @@ pipfile = "*"
 psycopg2-binary = "*"
 
 [required]
-python = "3.7.2"
+python = "3.7.4"
