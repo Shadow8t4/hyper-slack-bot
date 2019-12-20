@@ -2,7 +2,7 @@
 from psycopg2 import connect
 
 
-def import_words(dbname='slackbot_db', user='slackbot'):
+def import_words(dbname='slackbot_db', user='slackbot', port=5432):
     """Import a list of words into the specified database
     
     Keyword Arguments:
@@ -10,7 +10,7 @@ def import_words(dbname='slackbot_db', user='slackbot'):
         user {str} -- User to import to database as (default: {'slackbot'})
     """
     try:
-        con = connect("dbname={0} user={1}".format(dbname, user))
+        con = connect("dbname={0} user={1} port={2}".format(dbname, user, port))
         cur = con.cursor()
     except:
         print('Couldn\'t connect to the database.')
@@ -44,7 +44,7 @@ def import_words(dbname='slackbot_db', user='slackbot'):
     con.close()
 
 
-def import_bingo(dbname='slackbot_db', user='slackbot'):
+def import_bingo(dbname='slackbot_db', user='slackbot', port=5432):
     """Import the bingo word bank database and return a dictionary of the information
     
     Keyword Arguments:
@@ -53,7 +53,7 @@ def import_bingo(dbname='slackbot_db', user='slackbot'):
     """
 
     try:
-        con = connect("dbname={0} user={1}".format(dbname, user))
+        con = connect("dbname={0} user={1} port={2}".format(dbname, user, port))
         cur = con.cursor()
     except:
         print('I had an issue connecting to the database.')

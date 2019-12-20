@@ -146,7 +146,7 @@ def trigger_event(**payload):
                     sbe.disable_function(
                         web_client, data, config.functions_status)
 
-                if config.functions_status['emoji'] and emoji_match:
+                if config.functions_status['emoji'] and emoji_match and not 'files' in data:
                     bot_user_id = web_client.auth_test()['user_id']
                     if not (bot_user_id is data['user']):
                         sbe.format_replaced_message(environ['SLACK_API_TOKEN_ADMIN'], web_client,
@@ -196,8 +196,8 @@ def trigger_event(**payload):
 def main():
     """Ensure there's an output folder for logs, start the bot.
     """
-    import_words(user=config.db_user)
-    import_bingo(user=config.db_user)
+    import_words(dbname=config.db_name, user=config.db_user, port=config.port)
+    import_bingo(dbname=config.db_name, user=config.db_user, port=config.port)
 
     if(not exists('./logs')):
         mkdir('logs')

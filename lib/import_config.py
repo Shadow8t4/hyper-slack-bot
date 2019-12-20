@@ -14,6 +14,8 @@ class Config:
         self.db_name = config_dict['db_name']
         # Database user to read from database as
         self.db_user = config_dict['db_user']
+        # Database port
+        self.port = config_dict['port']
         # Characters to generate words for when matching a phrase
         self.word_chars = config_dict['word_chars']
         # Regex for phrase replacement searches in messages
