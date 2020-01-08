@@ -154,10 +154,10 @@ def trigger_event(**payload):
 
                 if config.functions_status['phrase'] and phrase_match:
                     sbe.trigger_response(
-                        web_client, data, phrase_match, config.word_chars, user=config.db_user)
+                        web_client, data, phrase_match, config.word_chars, dbname=config.db_name, user=config.db_user, port=config.port)
 
                 if config.functions_status['bingo'] and (data['text'].lower() == 'bingo'):
-                    sbe.bingo(web_client, data, user=config.db_user,
+                    sbe.bingo(web_client, data, dbname=config.db_name, user=config.db_user, port=config.port,
                               font=config.fontpath)
 
                 if(data['text'].split(' ')[0] == '!enable'):

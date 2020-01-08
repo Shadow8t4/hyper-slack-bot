@@ -12,6 +12,7 @@ import json
 import os
 import re
 
+
 def first_time_setup():
     return
 
@@ -123,7 +124,7 @@ def announce(client, data_text, data_channel):
                         channel=channel,
                         text=announcement
                     )
- 
+
         if(not in_channel):
             client.chat_postMessage(
                 channel=data_channel,
@@ -147,7 +148,7 @@ def delete_readonly(api_token, data_text, data_channel, data_ts):
     output = ''
     try:
         client = slack.WebClient(api_token)
-        response = client.chat_delete(
+        client.chat_delete(
             channel=data_channel,
             ts=data_ts
         )
@@ -316,14 +317,15 @@ def delete_replaced_message(api_token, data_text, data_channel, data_ts, re_stri
     output = ''
     try:
         client = slack.WebClient(api_token)
-        response = client.chat_delete(
+        client.chat_delete(
             channel=data_channel,
             ts=data_ts
         )
 
         output = re.sub(re_string, replacement, data_text)
     except Exception as e:
-        output = 'I encountered an error trying to replace a message... {0}'.format(e)
+        output = 'I encountered an error trying to replace a message... {0}'.format(
+            e)
     return output
 
 
@@ -355,21 +357,21 @@ def format_replaced_message(api_token, client, data_text_filtered, filtered_data
             data_text_replaced.append(w)
 
     user = data['user']
-    response = client.chat_postMessage(
+    client.chat_postMessage(
         channel=data['channel'],
         text=f'<@{user}>' +
         ': {0}'.format(' '.join(data_text_replaced))
     )
 
 
-def trigger_response(client, data, re_match, chars, dbname='slackbot_db', user='slackbot'):
+def trigger_response(client, data, re_match, chars, dbname='slackbot_db', user='slackbot', port=5432):
     """Respond to new messages that match a pattern with two random words starting with specified chars
 
     Arguments:
         client {object} -- Non-admin level client to send messages as (bot)
         data {dict} -- Data dictionary containing slack message information
         re_match {str} -- Matches confirmed using the regex search
-    
+
     Keyword Arguments:
         dbname {str} -- [Database name to pull from] (default: {'slackbot_db'})
         user {str} -- [User to enter database as] (default: {'slackbot'})
@@ -385,13 +387,15 @@ def trigger_response(client, data, re_match, chars, dbname='slackbot_db', user='
 
     response_words_counts = []
     for c in chars:
-        cur.execute("SELECT COUNT(word) FROM words WHERE letter='{0}';".format(c))
+        cur.execute(
+            "SELECT COUNT(word) FROM words WHERE letter='{0}';".format(c))
         response_words_counts.append(cur.fetchone()[0])
 
     response_words = []
     index = 0
     while index < len(chars):
-        cur.execute("SELECT word FROM words WHERE id={0} AND letter='{1}';".format(rr(response_words_counts[index]), chars[index]))
+        cur.execute("SELECT word FROM words WHERE id={0} AND letter='{1}';".format(
+            rr(response_words_counts[index]), chars[index]))
         response_words.append(cur.fetchone()[0].strip().capitalize())
         index += 1
 
@@ -404,7 +408,7 @@ def trigger_response(client, data, re_match, chars, dbname='slackbot_db', user='
     con.close()
 
 
-def bingo(client, data, dbname='slackbot_db', user='slackbot', font='/usr/share/fonts/truetype/msttcorefonts/arial.ttf'):
+def bingo(client, data, dbname='slackbot_db', user='slackbot', port=5432, font='/usr/share/fonts/truetype/msttcorefonts/arial.ttf'):
     """Generate a bingo board from a phrase database and respond with it
 
     Arguments:

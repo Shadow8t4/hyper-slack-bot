@@ -3,7 +3,7 @@
 
 def import_readonly():
     """Import readonly channels list from assets/ if available
-    
+
     Returns:
         arr -- Array of readonly channels created from assets/readonly_channels.txt
     """
@@ -23,10 +23,10 @@ def import_readonly():
 
 def export_readonly(readonly_arr):
     """Export readonly channels list to assets/
-    
+
     Arguments:
         readonly_arr {str} -- Current readonly channels list
-    
+
     Returns:
         str -- Status output for exported list
     """
