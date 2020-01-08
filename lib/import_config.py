@@ -27,14 +27,13 @@ class Config:
         # Dict for enabling/disabling bot functionality
         self.functions_status = config_dict['functions_status']
 
-
     def reload_config(self, config_path='slackbot_config.json'):
         """Optional method to reload config file for changes
-        
+
         Keyword Arguments:
             config_path {str} -- Optional argument for path to config file (default: {'slackbot_config.json'})
         """
-        
+
         config_dict = load(open(config_path, 'rb'))
         self.emoji_sub = config_dict['emoji_sub']
         self.db_name = config_dict['db_name']

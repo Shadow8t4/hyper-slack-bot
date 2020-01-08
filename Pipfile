@@ -4,16 +4,17 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+robotframework = "*"
 autopep8 = "*"
 pylint = "*"
 pipfile = "*"
 
 [packages]
-slackclient = "*"
 Pillow = "*"
-robotframework = "*"
 pipfile = "*"
-psycopg2-binary = "*"
 
 [required]
 python = "3.7.4"
+slackclient = "*"
+psycopg2-binary = "*"
+sqlalchemy = "*"
