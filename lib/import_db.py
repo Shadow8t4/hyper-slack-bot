@@ -4,13 +4,14 @@ from psycopg2 import connect
 
 def import_words(dbname='slackbot_db', user='slackbot', port=5432):
     """Import a list of words into the specified database
-    
+
     Keyword Arguments:
         dbname {str} -- Name of the database to import to (default: {'slackbot_db'})
         user {str} -- User to import to database as (default: {'slackbot'})
     """
     try:
-        con = connect("dbname={0} user={1} port={2}".format(dbname, user, port))
+        con = connect(
+            "dbname={0} user={1} port={2}".format(dbname, user, port))
         cur = con.cursor()
     except:
         print('Couldn\'t connect to the database.')
@@ -18,12 +19,13 @@ def import_words(dbname='slackbot_db', user='slackbot', port=5432):
         word_db = open('assets/word_db.txt')
     except:
         print('Didn\'t find the words file.')
-    
+
     words = word_db.readlines()
 
     # Create words table
     try:
-        cur.execute("CREATE TABLE words (letter varchar(1), id int, word varchar);")
+        cur.execute(
+            "CREATE TABLE words (letter varchar(1), id int, word varchar);")
     except:
         pass
 
@@ -36,24 +38,26 @@ def import_words(dbname='slackbot_db', user='slackbot', port=5432):
             except:
                 index_dict[w.strip()[0]] = 0
             try:
-                cur.execute("INSERT INTO words VALUES (%s, %s, %s);", (w.strip()[0], index_dict[w.strip()[0]], w.strip()))
+                cur.execute("INSERT INTO words VALUES (%s, %s, %s);",
+                            (w.strip()[0], index_dict[w.strip()[0]], w.strip()))
             except:
                 pass
-                
+
     con.commit()
     con.close()
 
 
 def import_bingo(dbname='slackbot_db', user='slackbot', port=5432):
     """Import the bingo word bank database and return a dictionary of the information
-    
+
     Keyword Arguments:
         dbname {str} -- Name of the database to import to (default: {'slackbot_db'})
         user {str} -- User to import to the database as (default: {'slackbot'})
     """
 
     try:
-        con = connect("dbname={0} user={1} port={2}".format(dbname, user, port))
+        con = connect(
+            "dbname={0} user={1} port={2}".format(dbname, user, port))
         cur = con.cursor()
     except:
         print('I had an issue connecting to the database.')
@@ -62,12 +66,13 @@ def import_bingo(dbname='slackbot_db', user='slackbot', port=5432):
         bingodb = open('assets/bingo_db.txt')
     except:
         print('I had an issue finding the bingo file.')
-    
+
     bingo = bingodb.readlines()
 
     # Create bingo table
     try:
-        cur.execute("CREATE TABLE bingo (main bool, id int, word varchar, used bool);")
+        cur.execute(
+            "CREATE TABLE bingo (main bool, id int, word varchar, used bool);")
     except:
         print('Table already created.')
 
@@ -82,12 +87,14 @@ def import_bingo(dbname='slackbot_db', user='slackbot', port=5432):
             else:
                 if(is_main):
                     try:
-                        cur.execute("INSERT INTO bingo VALUES ({0}, {1}, '{2}', FALSE);".format(is_main, m_index, w.strip()))
+                        cur.execute("INSERT INTO bingo VALUES ({0}, {1}, '{2}', FALSE);".format(
+                            is_main, m_index, w.strip()))
                     except:
                         pass
                 else:
                     try:
-                        cur.execute("INSERT INTO bingo VALUES ({0}, {1}, '{2}', FALSE);".format(is_main, e_index, w.strip()))
+                        cur.execute("INSERT INTO bingo VALUES ({0}, {1}, '{2}', FALSE);".format(
+                            is_main, e_index, w.strip()))
                     except:
                         pass
 
