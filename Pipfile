@@ -12,9 +12,9 @@ pipfile = "*"
 [packages]
 Pillow = "*"
 pipfile = "*"
-
-[required]
-python = "3.7.4"
 slackclient = "*"
 psycopg2-binary = "*"
 sqlalchemy = "*"
+
+[required]
+python = "3.7.4"
