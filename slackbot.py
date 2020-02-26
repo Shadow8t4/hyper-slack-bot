@@ -154,10 +154,10 @@ def trigger_event(**payload):
 
                 if config.functions_status['phrase'] and phrase_match:
                     sbe.trigger_response(
-                        web_client, data, phrase_match, config.word_chars, dbname=config.db_name, user=config.db_user, port=config.port)
+                        web_client, data, phrase_match, config.word_chars, dbname=config.db_name, user=config.db_user, port=config.db_port, password=config.db_password, host=config.db_host)
 
                 if config.functions_status['bingo'] and (data['text'].lower() == 'bingo'):
-                    sbe.bingo(web_client, data, dbname=config.db_name, user=config.db_user, port=config.port,
+                    sbe.bingo(web_client, data, dbname=config.db_name, user=config.db_user, port=config.db_port, password=config.db_password, host=config.db_host,
                               font=config.fontpath)
 
                 if(data['text'].split(' ')[0] == '!enable'):
@@ -196,16 +196,13 @@ def trigger_event(**payload):
 def main():
     """Ensure there's an output folder for logs, start the bot.
     """
-    import_words(dbname=config.db_name, user=config.db_user, port=config.port)
-    import_bingo(dbname=config.db_name, user=config.db_user, port=config.port)
+    import_words(dbname=config.db_name, user=config.db_user, port=config.db_port, password=config.db_password, host=config.db_host)
+    import_bingo(dbname=config.db_name, user=config.db_user, port=config.db_port, password=config.db_password, host=config.db_host)
 
     if(not exists('./logs')):
         mkdir('logs')
 
     log_output(environ['SLACK_BOT_ENV'], '\t***** Started Running *****\n')
-
-    if(fork()):
-        exit()
 
     slack_token = environ['SLACK_API_TOKEN']
     rtm_client = slack.RTMClient(token=slack_token)
@@ -223,16 +220,19 @@ if(__name__ == '__main__'):
     if(input_dict['env'] == 'test'):
         if(not exists('./output')):
             mkdir('output')
-        api_token_file = open('.api_token_admin_dev')
-        environ['SLACK_API_TOKEN'] = api_token_file.readline().strip()
-        environ['SLACK_BOT_ENV'] = 'Dev'
+        # api_token_file = open('.api_token_admin_dev')
+        # environ['SLACK_API_TOKEN'] = api_token_file.readline().strip()
+        # environ['SLACK_BOT_ENV'] = 'Dev'
         # run_tests(input_dict['num'])
     else:
-        api_token_admin_file = open(
-            '.api_token_admin_{0}'.format(input_dict['env']))
-        api_token_file = open(
-            '.api_token_{0}'.format(input_dict['env']))
-        environ['SLACK_API_TOKEN_ADMIN'] = api_token_admin_file.readline().strip()
-        environ['SLACK_API_TOKEN'] = api_token_file.readline().strip()
-        environ['SLACK_BOT_ENV'] = input_dict['env'].capitalize()
+        if('SLACK_API_TOKEN' in environ):
+            pass
+        else:
+            api_token_admin_file = open(
+                '.keys/.api_token_admin_{0}'.format(input_dict['env']))
+            api_token_file = open(
+                '.keys/.api_token_{0}'.format(input_dict['env']))
+            environ['SLACK_API_TOKEN_ADMIN'] = api_token_admin_file.readline().strip()
+            environ['SLACK_API_TOKEN'] = api_token_file.readline().strip()
+            environ['SLACK_BOT_ENV'] = input_dict['env'].capitalize()
         main()

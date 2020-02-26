@@ -15,7 +15,11 @@ class Config:
         # Database user to read from database as
         self.db_user = config_dict['db_user']
         # Database port
-        self.port = config_dict['port']
+        self.db_port = config_dict['db_port']
+        # Database password
+        self.db_password = config_dict['db_password']
+        # Database hostname
+        self.db_host = config_dict['db_host']
         # Characters to generate words for when matching a phrase
         self.word_chars = config_dict['word_chars']
         # Regex for phrase replacement searches in messages
@@ -38,6 +42,8 @@ class Config:
         self.emoji_sub = config_dict['emoji_sub']
         self.db_name = config_dict['db_name']
         self.db_user = config_dict['db_user']
+        self.db_port = config_dict['db_port']
+        self.db_host = config_dict['db_host']
         self.word_chars = config_dict['word_chars']
         self.phrase_re = compile(config_dict['phrase_re'])
         self.emoji_re = compile(config_dict['emoji_re'])
