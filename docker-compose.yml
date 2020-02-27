@@ -11,20 +11,15 @@ services:
       - net
     links:
       - postgres
-    volumes:
-      - ./assets:/home/slackbot/assets
-      - ./logs:/home/slackbot/logs
-      - ./lib:/home/slackbot/lib
-      - ./output:/home/slackbot/output
-      - ./.keys:/home/slackbot/.keys
     environment:
-      POSTGRES_PASSWORD_FILE: /home/slackbot/.keys/.pgdb_pass
+      POSTGRES_PASSWORD_FILE: /home/slackbot/keys/.pgdb_pass
       POSTGRES_DB: slackbot_prod
       POSTGRES_USER: slackbot
       POSTGRES_HOST: localhost
       POSTGRES_PORT: 5432
       PGDATA: /var/lib/postgresql/data/pg_data
-    command: prod
+    command: /bin/sh -c "pipenv install && pipenv run python slackbot.py prod"
+    restart: unless-stopped
   postgres:
     image: postgres:alpine
     networks:
@@ -33,9 +28,9 @@ services:
       - 5432:5432
     volumes:
       - ./pg_data:/var/lib/postgresql/data/pg_data
-      - ./.keys:/.keys
+      - ./.keys:/keys
     environment:
-      POSTGRES_PASSWORD_FILE: /.keys/.pgdb_pass
+      POSTGRES_PASSWORD_FILE: /keys/.pgdb_pass
       POSTGRES_DB: slackbot_prod
       POSTGRES_USER: slackbot
       POSTGRES_HOST: localhost
