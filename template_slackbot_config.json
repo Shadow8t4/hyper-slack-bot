@@ -1,12 +1,14 @@
 {
     "emoji_sub":":confetti_ball:",
     "db_user":"slackbot",
-    "db_name":"slackbotdb",
-    "port":"5432",
+    "db_name":"slackbot_prod",
+    "db_host":"localhost",
+    "db_port":"5432",
+    "db_password":"db_password",
     "word_chars":"fun",
-    "phrase_re":"(f[a-zA-Z']+ u[a-zA-Z']+ n[a-zA-Z']+|fun)",
-    "emoji_re":"(?!:)[Yy]a(y)+(?!:)",
-    "fontpath":"/usr/share/fonts/REPLACE_THIS_PATH_WITH_PATH_TO_FONT.ttf",
+    "phrase_re":"(f[a-zA-Z' ]*u[a-zA-Z' ]*n[a-zA-Z']*|fun)",
+    "emoji_re":"(?!:)[Yy]a[Yy]+(?!:)",
+    "fontpath":"/usr/share/fonts/REPLACE_ME.ttf",
     "functions_status":
     {
         "phrase": true,

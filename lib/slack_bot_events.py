@@ -11,6 +11,7 @@ import slack
 import json
 import os
 import re
+from lib.bot_logging import log_output
 
 
 def first_time_setup():
@@ -364,7 +365,7 @@ def format_replaced_message(api_token, client, data_text_filtered, filtered_data
     )
 
 
-def trigger_response(client, data, re_match, chars, dbname='slackbot_db', user='slackbot', port=5432):
+def trigger_response(client, data, re_match, chars, dbname='slackbot_db', user='slackbot', port=5432, password='testing', host='localhost'):
     """Respond to new messages that match a pattern with two random words starting with specified chars
 
     Arguments:
@@ -382,7 +383,7 @@ def trigger_response(client, data, re_match, chars, dbname='slackbot_db', user='
     if(match_formatted.upper() == chars.upper()):
         match_formatted = match_formatted.upper()
 
-    con = connect("dbname={0} user={1}".format(dbname, user))
+    con = connect("dbname={0} user={1} port={2} password={3} host={4}".format(dbname, user, port, password, host))
     cur = con.cursor()
 
     response_words_counts = []
@@ -408,7 +409,7 @@ def trigger_response(client, data, re_match, chars, dbname='slackbot_db', user='
     con.close()
 
 
-def bingo(client, data, dbname='slackbot_db', user='slackbot', port=5432, font='/usr/share/fonts/truetype/msttcorefonts/arial.ttf'):
+def bingo(client, data, dbname='slackbot_db', user='slackbot', port=5432, password='testing', host='localhost', font='/usr/share/fonts/truetype/msttcorefonts/arial.ttf'):
     """Generate a bingo board from a phrase database and respond with it
 
     Arguments:
@@ -419,6 +420,9 @@ def bingo(client, data, dbname='slackbot_db', user='slackbot', port=5432, font='
     bingo_generated = gen_bingo(
         dbname,
         user,
+        port,
+        password,
+        host,
         'bingo_board',
         640,
         480,

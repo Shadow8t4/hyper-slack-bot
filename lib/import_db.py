@@ -2,7 +2,7 @@
 from psycopg2 import connect
 
 
-def import_words(dbname='slackbot_db', user='slackbot', port=5432):
+def import_words(dbname='slackbot_db', user='slackbot', port=5432, password='password', host='localhost'):
     """Import a list of words into the specified database
 
     Keyword Arguments:
@@ -11,14 +11,16 @@ def import_words(dbname='slackbot_db', user='slackbot', port=5432):
     """
     try:
         con = connect(
-            "dbname={0} user={1} port={2}".format(dbname, user, port))
+            "dbname={0} user={1} port={2} password={3} host={4}".format(dbname, user, port, password, host))
         cur = con.cursor()
-    except:
-        print('Couldn\'t connect to the database.')
+    except Exception as e:
+        print(f'Couldn\'t connect to the database.\n{e}')
+        exit(1)
     try:
         word_db = open('assets/word_db.txt')
     except:
         print('Didn\'t find the words file.')
+        exit(1)
 
     words = word_db.readlines()
 
@@ -47,7 +49,7 @@ def import_words(dbname='slackbot_db', user='slackbot', port=5432):
     con.close()
 
 
-def import_bingo(dbname='slackbot_db', user='slackbot', port=5432):
+def import_bingo(dbname='slackbot_db', user='slackbot', port=5432, password='password', host='localhost'):
     """Import the bingo word bank database and return a dictionary of the information
 
     Keyword Arguments:
@@ -57,15 +59,17 @@ def import_bingo(dbname='slackbot_db', user='slackbot', port=5432):
 
     try:
         con = connect(
-            "dbname={0} user={1} port={2}".format(dbname, user, port))
+            "dbname={0} user={1} port={2} password={3} host={4}".format(dbname, user, port, password, host))
         cur = con.cursor()
-    except:
-        print('I had an issue connecting to the database.')
+    except Exception as e:
+        print(f'I had an issue connecting to the database.\n{e}')
+        exit(1)
 
     try:
         bingodb = open('assets/bingo_db.txt')
-    except:
-        print('I had an issue finding the bingo file.')
+    except Exception as e:
+        print(f'I had an issue finding the bingo file.\n{e}')
+        exit(1)
 
     bingo = bingodb.readlines()
 

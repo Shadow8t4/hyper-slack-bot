@@ -5,7 +5,7 @@ from os import mkdir
 from psycopg2 import connect
 
 
-def gen_bingo(dbname, user, filename, width, height, bg_color, line_color, text_color, font_path, free_space=''):
+def gen_bingo(dbname, user, port, password, host, filename, width, height, bg_color, line_color, text_color, font_path, free_space=''):
     """Generate a bingo image
 
     Arguments:
@@ -36,7 +36,7 @@ def gen_bingo(dbname, user, filename, width, height, bg_color, line_color, text_
                   fill=line_color, width=5, joint=None)
 
     board_values = []
-    con = connect("dbname={0} user={1}".format(dbname, user))
+    con = connect("dbname={0} user={1} port={2} password={3} host={4}".format(dbname, user, port, password, host))
     cur = con.cursor()
 
     it = 0
