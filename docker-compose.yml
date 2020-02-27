@@ -5,24 +5,26 @@ services:
       context: .
       dockerfile: Dockerfile
     image: slackbot:latest
-    #user: slackbot
+    user: slackbot
     container_name: slackbot_container_service
     networks:
       - net
+    links:
+      - postgres
     volumes:
-      - ./assets:/assets
-      - ./logs:/logs
-      - ./lib:/lib
-      - ./output:/output
-      - ./.keys:/.keys
+      - ./assets:/home/slackbot/assets
+      - ./logs:/home/slackbot/logs
+      - ./lib:/home/slackbot/lib
+      - ./output:/home/slackbot/output
+      - ./.keys:/home/slackbot/.keys
     environment:
-      POSTGRES_PASSWORD_FILE: .keys/.pgdb_pass
+      POSTGRES_PASSWORD_FILE: /home/slackbot/.keys/.pgdb_pass
       POSTGRES_DB: slackbot_prod
       POSTGRES_USER: slackbot
       POSTGRES_HOST: localhost
       POSTGRES_PORT: 5432
       PGDATA: /var/lib/postgresql/data/pg_data
-    #network_mode: host
+    command: prod
   postgres:
     image: postgres:alpine
     networks:
@@ -31,8 +33,9 @@ services:
       - 5432:5432
     volumes:
       - ./pg_data:/var/lib/postgresql/data/pg_data
+      - ./.keys:/.keys
     environment:
-      POSTGRES_PASSWORD_FILE: .keys/.pgdb_pass
+      POSTGRES_PASSWORD_FILE: /.keys/.pgdb_pass
       POSTGRES_DB: slackbot_prod
       POSTGRES_USER: slackbot
       POSTGRES_HOST: localhost

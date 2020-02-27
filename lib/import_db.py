@@ -13,8 +13,8 @@ def import_words(dbname='slackbot_db', user='slackbot', port=5432, password='pas
         con = connect(
             "dbname={0} user={1} port={2} password={3} host={4}".format(dbname, user, port, password, host))
         cur = con.cursor()
-    except:
-        print('Couldn\'t connect to the database.')
+    except Exception as e:
+        print(f'Couldn\'t connect to the database.\n{e}')
         exit(1)
     try:
         word_db = open('assets/word_db.txt')
@@ -61,13 +61,15 @@ def import_bingo(dbname='slackbot_db', user='slackbot', port=5432, password='pas
         con = connect(
             "dbname={0} user={1} port={2} password={3} host={4}".format(dbname, user, port, password, host))
         cur = con.cursor()
-    except:
-        print('I had an issue connecting to the database.')
+    except Exception as e:
+        print(f'I had an issue connecting to the database.\n{e}')
+        exit(1)
 
     try:
         bingodb = open('assets/bingo_db.txt')
-    except:
-        print('I had an issue finding the bingo file.')
+    except Exception as e:
+        print(f'I had an issue finding the bingo file.\n{e}')
+        exit(1)
 
     bingo = bingodb.readlines()
 

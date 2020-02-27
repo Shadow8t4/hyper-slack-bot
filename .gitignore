@@ -12,3 +12,5 @@ tester.py
 output/**
 assets/**
 slackbot_config.json
+.keys/**
+Pipfile.lock

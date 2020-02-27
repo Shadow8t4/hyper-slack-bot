@@ -15,11 +15,32 @@ RUN apk --no-cache add jpeg-dev \
                        gcc \
                        musl-dev \
                        python3-dev \
-                       postgresql-dev
+                       postgresql-dev \
+                       msttcorefonts-installer \
+                       fontconfig
 
-# Set the end work directory to root
-# NOTE: Want to not be root user for security
-WORKDIR /
+# Update the fonts cache
+RUN update-ms-fonts && \
+    fc-cache -f && \
+    rm -rf /var/cache/*
+
+# Create a new user to run as and set the working directory
+ENV USER=slackbot
+ENV UID=991
+ENV GID=991
+
+RUN addgroup -g "${GID}" slackbot
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/home/slackbot" \
+    --ingroup "${USER}" \
+    --uid "${UID}" \
+    "${USER}"
+
+USER slackbot
+WORKDIR /home/slackbot/
+ENV PATH="${PATH}:/home/slackbot/.local/bin"
 
 # Copy the Pipfile, it shouldn't change unless during development
 COPY Pipfile Pipfile
@@ -33,3 +54,6 @@ COPY slackbot.py slackbot.py
 
 # This should also later be handled with a mount
 COPY slackbot_config.json slackbot_config.json
+
+# Makes it easier to run the container, especially when running individually
+ENTRYPOINT [ "pipenv", "run", "python", "slackbot.py" ]

@@ -2,27 +2,85 @@
 
 A Slack bot written in Python to do a few various things.
 
-## Usage
+## Setup
 
-Clone this repo, then make sure you have the modules listed in `Pipfile` in your python environment.
+These are the requirements and steps for setup if you plan to install and run the bot on bare metal.
 
-If you have [pyenv](https://github.com/pyenv/pyenv) installed, you can install the proper Python environment needed by executing:
+### Requirements
 
-`pyenv install 3.7.4`
+- Postgres
+- Python (Native 3.X, Pyenv)
 
-`pyenv local 3.7.4`
+Currently, the bot requires a Postgres Database and some version of Python 3 Testing has actively been done on 3.6+, so using anything older is a risk.
 
-`pyenv exec pip install pipenv`
+### Prerequisites
 
-If you have [pipenv](https://pypi.org/project/pipenv) installed, you can setup the Python environment using:
+On Debian-based distrobutions, you should be able to use the following to command to install prerequisites.
+
+```
+sudo apt install -y postgresql-common python3 python3-dev python3-pip gcc libgc-dev tk-dev tcl-dev
+```
+
+### Postgres Setup
+
+Once you have postgres installed, you will need to create a new role and database.
+
+```
+CREATE ROLE "slackbot" WITH LOGIN;
+\password slackbot
+CREATE DATABASE "slackbot_prod" WITH OWNER "slackbot";
+```
+
+### Python Setup
+
+It's recommended that you use `pipenv` to install the packages required.
 
 `pipenv install Pipfile`
 
-or `pyenv exec pipenv install Pipfile` if you're using pyenv.
+Otherwise, you can manually install the packges laid out in the `Pipfile`.
+
+### Docker Compose
+
+Alternatively, you can install and run the bot using Docker.
+
+Check the docker-compose.yml to ensure that you have all of the directories that are referenced in the `volumes:` sections.
+
+```
+mkdir .keys pg_data
+chmod -R a+w output logs pg_data
+echo 'sample_password' >> .keys/.pgdb_pass
+```
+
+Additionally, you should ensure you have gone through the following configuration steps. Make sure that whatever password you put in `.keys/.pgdb_pass` is also in your `slackbot_config.json`.
+
+Otherwise, `docker-compose up --build -d` should build and run the service.
+
+### Config
+
+Before attempting to run the bot, you will need to copy the `template_slackbot_config.json` file and rename it to `slackbot_config.json`.
+
+`cp template_slackbot_config.json slackbot_config.json`
+
+Here is a basic description of each key-value pair:
+- emoji_sub: When substituting a message with an emoji, choose what emoji is set in place
+- db_user: Postgres DB User
+- db_name: Postgres DB Name
+- db_host: Postgres DB Hostname
+- db_port: Postgres DB Port
+- db_password: Postgres DB User Password
+- word_chars: Set of letter categories to grab words from in the word table
+- phrase_re: Regular Expression for what messages to respond to with words from the word table
+- emoji_re: Reguard Expression for what words to replace with emoji_sub
+- fontpath: Path to a .ttf font file in the system
+- functions_status: Set the status of which functions are enabled by default
+
+### Slack API Keys
 
 You will need an API token from Slack, you can learn that and more on how to set up a bot from this documentation: https://github.com/slackapi/python-slackclient/blob/master/tutorial/01-creating-the-slack-app.md
 
-You'll need both tokens for the bot to work properly, name them: `.api_token_prod` and `.api_token_admin_prod` for your bot user oauth token and admin oauth token respectively.
+You'll need both tokens for the bot to work properly, name them: `.api_token_prod` and `.api_token_admin_prod` for your bot user oauth token and admin oauth token respectively, and move them to the `.keys/` directory. If you haven't already created that subdirectory, do so now.
+
+## Usage
 
 Once you have set up and installed your app/bot, you can run it by typing:
 
@@ -83,3 +141,8 @@ You can tell the bot to send messages to a channel, this is intended to be a way
 ## Troubleshooting
 
 Logs, while somewhat vague at times, are sent to the `logs/` directory when you run the bot. It will create the directory and the files, and add to them each time a message is sent. A new log file is created each day.
+
+If you have any questions or need help with setup, feel free to contact me:
+- email: adh9694@gmail.com
+- discord: @shadow8t4#8276
+- matrix: @shadow8t4:matrix.werefox.dev
