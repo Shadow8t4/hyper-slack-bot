@@ -21,8 +21,7 @@ RUN apk --no-cache add jpeg-dev \
 
 # Update the fonts cache
 RUN update-ms-fonts && \
-    fc-cache -f && \
-    rm -rf /var/cache/*
+    fc-cache -f
 
 # Create a new user to run as and set the working directory
 ENV USER=slackbot
@@ -38,7 +37,6 @@ RUN adduser \
     --uid "${UID}" \
     "${USER}"
 
-USER slackbot
 WORKDIR /home/slackbot/
 ENV PATH="${PATH}:/home/slackbot/.local/bin"
 
@@ -47,7 +45,7 @@ COPY Pipfile Pipfile
 
 # Install the necessary Python environment packages
 RUN pip install pipenv
-RUN pipenv install Pipfile
+#RUN pipenv install Pipfile
 
 # Copy the slackbot script, shouldn't change unless during development
 COPY slackbot.py slackbot.py
@@ -55,5 +53,16 @@ COPY slackbot.py slackbot.py
 # This should also later be handled with a mount
 COPY slackbot_config.json slackbot_config.json
 
+# I just straight up can't mount these
+COPY assets assets
+COPY lib lib
+COPY logs logs
+COPY output output
+COPY .keys .keys
+
+# Ensure that they all have the correct permissions
+RUN chown -R slackbot:slackbot /home/slackbot/* /home/slackbot/.keys/
+USER slackbot
+
 # Makes it easier to run the container, especially when running individually
-ENTRYPOINT [ "pipenv", "run", "python", "slackbot.py" ]
+#ENTRYPOINT [ "pipenv", "install", "&&" "pipenv", "run", "python", "slackbot.py" ]
